@@ -1,0 +1,39 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "Abhishek Dass Portfolio - Motorsports & Tech Enthusiast",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": [
+    "portfolio",
+    "motorsports",
+    "f1",
+    "ai",
+    "data-science"
+  ],
+  "author": "Abhishek Dass",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "autoprefixer": "^10.6.1",
+    "bcryptjs": "^3.0.3",
+    "framer-motion": "^14.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.11.0",
+    "next": "^16.3.8",
+    "postcss": "^8.5.29",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3"
+  }
+}
