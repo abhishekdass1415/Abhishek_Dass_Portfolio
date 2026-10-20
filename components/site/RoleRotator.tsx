@@ -8,7 +8,6 @@ export default function RoleRotator({ roles }: { roles: string[] }) {
 
   useEffect(() => {
     if (roles.length < 2) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const t = setInterval(() => setI((n) => (n + 1) % roles.length), 2600);
     return () => clearInterval(t);
   }, [roles.length]);

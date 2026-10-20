@@ -1026,15 +1026,22 @@ main {
 .ticker-track {
   display: flex;
   width: max-content;
-  animation: marquee 38s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  animation: marquee 35s linear infinite;
+  -webkit-animation: marquee 35s linear infinite;
 }
 
-.ticker:hover .ticker-track {
-  animation-play-state: paused;
+@media (hover: hover) and (pointer: fine) {
+  .ticker:hover .ticker-track {
+    animation-play-state: paused;
+  }
 }
 
 .ticker-row {
   display: flex;
+  flex-shrink: 0;
 }
 
 .ticker-item {
@@ -1054,8 +1061,20 @@ main {
 }
 
 @keyframes marquee {
-  to {
-    translate: -50% 0;
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@-webkit-keyframes marquee {
+  0% {
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+  100% {
+    -webkit-transform: translate3d(-50%, 0, 0);
   }
 }
 
