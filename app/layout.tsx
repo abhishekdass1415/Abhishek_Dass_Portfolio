@@ -39,14 +39,14 @@ export const viewport: Viewport = {
   colorScheme: 'light dark',
 };
 
-// Runs before first paint: restores the saved theme (or follows the OS) and marks JS as available.
-const bootScript = `(function(){try{var t=localStorage.getItem('theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){}document.documentElement.classList.add('js')})();`;
+// Runs before first paint: restores the saved theme (defaults to dark mode) and marks JS as available.
+const bootScript = `(function(){try{var t=localStorage.getItem('theme');if(!t||(t!=='light'&&t!=='dark')){t='dark';localStorage.setItem('theme','dark')}document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='dark'}document.documentElement.classList.add('js')})();`;
 
 const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-HXDTTFVD9H';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${display.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

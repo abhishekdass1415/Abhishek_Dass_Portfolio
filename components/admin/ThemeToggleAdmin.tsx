@@ -51,7 +51,7 @@ export default function ThemeToggleAdmin() {
       aria-label={theme === 'dark' ? 'Switch to Light mode' : 'Switch to Dark mode'}
     >
       <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={16} />
-      <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+      <span className="a-btn-text">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
     </button>
   );
 }

@@ -1,6 +1,7 @@
 import type { Portfolio } from '@/lib/types';
 import CircuitBackdrop from './CircuitBackdrop';
 import RoleRotator from './RoleRotator';
+import AnimatedStatValue from './AnimatedStatValue';
 import Socials from './Socials';
 import { Icon } from './Icon';
 
@@ -96,7 +97,7 @@ export default function Hero({ data }: { data: Portfolio }) {
           <dl className="stats">
             {stats.map((s, i) => (
               <div key={s.id} className="stat reveal" style={{ ['--d' as string]: `${i * 80}ms` }}>
-                <dt className="stat-value">{s.value}</dt>
+                <dt className="stat-value"><AnimatedStatValue value={s.value} /></dt>
                 <dd className="stat-label">{s.label}</dd>
               </div>
             ))}

@@ -28,14 +28,14 @@ export default function Dashboard() {
   return (
     <div className="admin-root">
       <header className="admin-top">
-        <strong>Portfolio Admin</strong>
+        <strong className="admin-brand">Portfolio Admin</strong>
         <div className="admin-top-actions">
           <ThemeToggleAdmin />
-          <a className="a-btn a-btn-ghost" href="/" target="_blank" rel="noopener noreferrer">
-            <Icon name="eye" size={16} /> View site
+          <a className="a-btn a-btn-ghost" href="/" target="_blank" rel="noopener noreferrer" title="View live site">
+            <Icon name="eye" size={16} /> <span className="a-btn-text">View site</span>
           </a>
-          <button className="a-btn a-btn-ghost" onClick={logout}>
-            <Icon name="logout" size={16} /> Log out
+          <button className="a-btn a-btn-ghost" onClick={logout} title="Log out">
+            <Icon name="logout" size={16} /> <span className="a-btn-text">Log out</span>
           </button>
         </div>
       </header>

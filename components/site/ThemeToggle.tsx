@@ -4,10 +4,23 @@ import { useEffect, useState } from 'react';
 import { Icon } from './Icon';
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
-    setTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+    const active = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+    setTheme(active);
+
+    const observer = new MutationObserver(() => {
+      const current = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+      setTheme(current);
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   const toggle = () => {

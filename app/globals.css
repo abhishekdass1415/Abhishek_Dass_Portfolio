@@ -14,26 +14,7 @@
   --font-mono: var(--font-mono), ui-monospace, monospace;
 }
 
-:root {
-  --bg: #ffffff;
-  --bg-alt: #f1f1ec;
-  --card: #ffffff;
-  --ink: #111216;
-  --ink-2: #3d4049;
-  --muted: #666a75;
-  --line: #111216;
-  --line-soft: #d8d8d0;
-  --shadow: #111216;
-  --y: #ffd500;
-  --g: #39ff14;
-  --accent: #ffd500;
-  --on-accent: #111216;
-  --bw: 3px;
-  --radius: 0px;
-  --header-h: 68px;
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
+:root,
 :root[data-theme="dark"] {
   --bg: #0c0d10;
   --bg-alt: #121419;
@@ -44,6 +25,26 @@
   --line: #f4f4ee;
   --line-soft: #2a2d35;
   --shadow: #ffd500;
+  --y: #ffd500;
+  --g: #39ff14;
+  --accent: #ffd500;
+  --on-accent: #111216;
+  --bw: 3px;
+  --radius: 0px;
+  --header-h: 68px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-alt: #f1f1ec;
+  --card: #ffffff;
+  --ink: #111216;
+  --ink-2: #3d4049;
+  --muted: #666a75;
+  --line: #111216;
+  --line-soft: #d8d8d0;
+  --shadow: #111216;
 }
 
 /* Always-dark blocks (hero, footer, project header) */
@@ -1788,6 +1789,7 @@ main {
   inset: 0;
   background: var(--y);
   transform-origin: left;
+  will-change: transform;
 }
 
 .meter em {
@@ -1800,13 +1802,16 @@ main {
 }
 
 .js .meter i.on::after {
-  scale: 0 1;
-  transition: scale 0.6s var(--ease);
-  transition-delay: calc(var(--i) * 110ms + 350ms);
+  transform: scaleX(0);
+  -webkit-transform: scaleX(0);
+  transition: transform 0.65s var(--ease);
+  -webkit-transition: -webkit-transform 0.65s var(--ease);
+  transition-delay: calc(var(--i) * 110ms + 250ms);
 }
 
 .js .module.in .meter i.on::after {
-  scale: 1 1;
+  transform: scaleX(1);
+  -webkit-transform: scaleX(1);
 }
 
 @media (min-width: 720px) {
@@ -2628,39 +2633,11 @@ body.lightbox-open .f1-bar {
   z-index: 1;
 }
 
-/* ═════════ Reduced motion ═════════ */
+/* ═════════ Reduced motion (accessible without breaking core ticker/meters) ═════════ */
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .js .reveal {
-    opacity: 1;
-    transform: none;
-  }
-
-  .ticker-track {
-    animation: none;
-  }
-
-  .circuit-car {
-    display: none;
-  }
-
-  .js .meter i.on::after {
-    scale: 1 1;
   }
 }
 

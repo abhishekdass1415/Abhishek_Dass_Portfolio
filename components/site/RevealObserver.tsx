@@ -9,10 +9,13 @@ export default function RevealObserver() {
 
   useEffect(() => {
     const els = Array.from(document.querySelectorAll<HTMLElement>('.reveal:not(.in)'));
+    if (!els.length) return;
+
     if (!('IntersectionObserver' in window)) {
       els.forEach((el) => el.classList.add('in'));
       return;
     }
+
     const io = new IntersectionObserver(
       (entries) =>
         entries.forEach((e) => {
@@ -21,9 +24,18 @@ export default function RevealObserver() {
             io.unobserve(e.target);
           }
         }),
-      { threshold: 0.12, rootMargin: '0px 0px -6% 0px' }
+      { threshold: 0.05, rootMargin: '0px 0px 40px 0px' }
     );
-    els.forEach((el) => io.observe(el));
+
+    els.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('in');
+      } else {
+        io.observe(el);
+      }
+    });
+
     return () => io.disconnect();
   }, [pathname]);
 
