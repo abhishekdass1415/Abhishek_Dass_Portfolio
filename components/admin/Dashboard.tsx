@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { COLLECTIONS } from '@/lib/schema';
 import { CollectionPanel, CommentsPanel, MediaPanel, MessagesPanel, ProfilePanel } from './Panels';
+import AnalyticsPanel from './AnalyticsPanel';
 import { Icon } from '@/components/site/Icon';
 
 const TABS = [
   { id: 'profile', label: 'Profile & About' },
+  { id: 'analytics', label: 'Analytics & Traffic' },
   ...Object.values(COLLECTIONS).map((c) => ({ id: c.name, label: c.label })),
   { id: 'comments', label: 'Blog Comments' },
   { id: 'messages', label: 'Messages' },
@@ -47,6 +49,7 @@ export default function Dashboard() {
         <main className="admin-main">
           <h1>{current.label}</h1>
           {tab === 'profile' && <ProfilePanel />}
+          {tab === 'analytics' && <AnalyticsPanel />}
           {tab === 'messages' && <MessagesPanel />}
           {tab === 'comments' && <CommentsPanel />}
           {tab === 'media' && <MediaPanel />}

@@ -1,7 +1,9 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import { getPortfolio, siteUrl } from '@/lib/data';
+import AnalyticsTracker from '@/components/site/AnalyticsTracker';
 
 const display = Space_Grotesk({ subsets: ['latin'], variable: '--font-display', display: 'swap' });
 const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
@@ -40,13 +42,40 @@ export const viewport: Viewport = {
 // Runs before first paint: restores the saved theme (or follows the OS) and marks JS as available.
 const bootScript = `(function(){try{var t=localStorage.getItem('theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){}document.documentElement.classList.add('js')})();`;
 
+const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-HXDTTFVD9H';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {gaId && (
+          <>
+            <Script
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+            />
+            <Script
+              id="google-analytics"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${gaId}', {
+                    page_path: window.location.pathname,
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
+        <AnalyticsTracker />
+        {children}
+      </body>
     </html>
   );
 }
