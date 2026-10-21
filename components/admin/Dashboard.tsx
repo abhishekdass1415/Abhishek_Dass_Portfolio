@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { COLLECTIONS } from '@/lib/schema';
 import { CollectionPanel, CommentsPanel, MediaPanel, MessagesPanel, ProfilePanel } from './Panels';
 import AnalyticsPanel from './AnalyticsPanel';
+import ThemeToggleAdmin from './ThemeToggleAdmin';
 import { Icon } from '@/components/site/Icon';
 
 const TABS = [
@@ -29,6 +30,7 @@ export default function Dashboard() {
       <header className="admin-top">
         <strong>Portfolio Admin</strong>
         <div className="admin-top-actions">
+          <ThemeToggleAdmin />
           <a className="a-btn a-btn-ghost" href="/" target="_blank" rel="noopener noreferrer">
             <Icon name="eye" size={16} /> View site
           </a>

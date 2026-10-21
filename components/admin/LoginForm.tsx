@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import ThemeToggleAdmin from './ThemeToggleAdmin';
 
 export default function LoginForm() {
   const [error, setError] = useState('');
@@ -23,21 +24,26 @@ export default function LoginForm() {
   }
 
   return (
-    <form className="login" onSubmit={submit}>
-      <h1>Admin login</h1>
-      <p className="a-muted">Only the site owner can sign in.</p>
-      <div className="a-field">
-        <label htmlFor="u">Username</label>
-        <input id="u" name="username" autoComplete="username" required autoFocus />
+    <div className="login-box-wrap">
+      <div className="login-top-bar">
+        <ThemeToggleAdmin />
       </div>
-      <div className="a-field">
-        <label htmlFor="p">Password</label>
-        <input id="p" name="password" type="password" autoComplete="current-password" required />
-      </div>
-      {error && <p className="a-error" role="alert">{error}</p>}
-      <button className="a-btn a-btn-primary" disabled={busy}>
-        {busy ? 'Signing in…' : 'Sign in'}
-      </button>
-    </form>
+      <form className="login" onSubmit={submit}>
+        <h1>Admin login</h1>
+        <p className="a-muted">Only the site owner can sign in.</p>
+        <div className="a-field">
+          <label htmlFor="u">Username</label>
+          <input id="u" name="username" autoComplete="username" required autoFocus />
+        </div>
+        <div className="a-field">
+          <label htmlFor="p">Password</label>
+          <input id="p" name="password" type="password" autoComplete="current-password" required />
+        </div>
+        {error && <p className="a-error" role="alert">{error}</p>}
+        <button className="a-btn a-btn-primary" disabled={busy}>
+          {busy ? 'Signing in…' : 'Sign in'}
+        </button>
+      </form>
+    </div>
   );
 }
