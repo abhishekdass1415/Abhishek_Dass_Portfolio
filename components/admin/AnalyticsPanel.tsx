@@ -194,7 +194,7 @@ export default function AnalyticsPanel() {
                 return (
                   <div key={ref} className="stat-row">
                     <div className="stat-info">
-                      <span className="stat-name">{ref}</span>
+                      <span className="stat-name" title={ref}>{ref}</span>
                       <span className="stat-count">
                         <strong>{count}</strong> ({pct}%)
                       </span>
@@ -226,7 +226,7 @@ export default function AnalyticsPanel() {
                 return (
                   <div key={page} className="stat-row">
                     <div className="stat-info">
-                      <code className="stat-name">{page}</code>
+                      <code className="stat-name" title={page}>{page}</code>
                       <span className="stat-count">
                         <strong>{count}</strong> ({pct}%)
                       </span>
@@ -271,10 +271,10 @@ export default function AnalyticsPanel() {
                     </span>
                   )}
                 </div>
-                <div className="visitor-path">
+                <div className="visitor-path" title={visit.path}>
                   <code>{visit.path}</code>
                 </div>
-                <div className="visitor-referrer">
+                <div className="visitor-referrer" title={visit.referrer}>
                   <span className="a-muted">via</span> {visit.referrer}
                 </div>
                 <div className="visitor-time a-muted">
