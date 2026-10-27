@@ -6,7 +6,14 @@ import { Icon } from './Icon';
 export default function BackToTop() {
   const [show, setShow] = useState(false);
   useEffect(() => {
-    const on = () => setShow(window.scrollY > 700);
+    let prev = false;
+    const on = () => {
+      const next = window.scrollY > 700;
+      if (next !== prev) {
+        prev = next;
+        setShow(next);
+      }
+    };
     on();
     window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);

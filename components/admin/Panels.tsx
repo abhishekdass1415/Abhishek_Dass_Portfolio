@@ -215,36 +215,285 @@ export function CollectionPanel({ name }: { name: string }) {
 
 export function MessagesPanel() {
   const [items, setItems] = useState<Doc[] | null>(null);
+  const [replyingTo, setReplyingTo] = useState<Doc | null>(null);
+  const [replySubject, setReplySubject] = useState('');
+  const [replyText, setReplyText] = useState('');
+  const [sending, setSending] = useState(false);
+  const [replyError, setReplyError] = useState('');
+  const [toast, setToast] = useState('');
+
   const load = useCallback(() => api<Doc[]>('/api/messages').then(setItems), []);
   useEffect(() => {
     load();
   }, [load]);
 
+  // Handle escape key to close reply modal
+  useEffect(() => {
+    if (!replyingTo) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !sending) setReplyingTo(null);
+    };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [replyingTo, sending]);
+
+  function openReply(m: Doc) {
+    setReplyingTo(m);
+    setReplySubject(`Re: Message from ${m.name} - Abhishek Dass`);
+    setReplyText('');
+    setReplyError('');
+  }
+
+  async function handleSendReply(e: React.FormEvent) {
+    e.preventDefault();
+    if (!replyingTo) return;
+    if (!replyText.trim()) {
+      setReplyError('Please enter your reply.');
+      return;
+    }
+    setSending(true);
+    setReplyError('');
+    try {
+      await api(`/api/messages/${replyingTo.id}/reply`, 'POST', {
+        subject: replySubject,
+        message: replyText,
+      });
+      const recipient = replyingTo.email;
+      setReplyingTo(null);
+      setToast(`Email reply successfully sent to ${recipient}!`);
+      setTimeout(() => setToast(''), 5000);
+      await load();
+    } catch (err: any) {
+      setReplyError(err?.message || 'Failed to send reply email.');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function handleOpenInGmail() {
+    if (!replyingTo || !replyText.trim()) {
+      setReplyError('Please enter your reply first.');
+      return;
+    }
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+      replyingTo.email
+    )}&su=${encodeURIComponent(replySubject)}&body=${encodeURIComponent(replyText)}`;
+    window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+
+    try {
+      await api(`/api/messages/${replyingTo.id}/reply`, 'POST', {
+        subject: replySubject,
+        message: replyText,
+        recordOnly: true,
+      });
+      const recipient = replyingTo.email;
+      setReplyingTo(null);
+      setToast(`Reply recorded & opened in Gmail for ${recipient}!`);
+      setTimeout(() => setToast(''), 5000);
+      await load();
+    } catch {
+      // opened in Gmail
+    }
+  }
+
   if (!items) return <p className="a-muted">Loading…</p>;
   if (!items.length) return <p className="a-empty">No messages yet. Messages from your contact form appear here.</p>;
 
   return (
-    <ul className="rows">
-      {items.map((m) => (
-        <li key={m.id} className={`row msg${m.read ? '' : ' unread'}`}>
-          <div className="row-main">
-            <strong>
-              {m.name} <a href={`mailto:${m.email}`}>{m.email}</a>
-            </strong>
-            <span className="a-muted">{new Date(m.createdAt).toLocaleString()}</span>
-            <p>{m.message}</p>
-          </div>
-          <div className="row-actions">
-            <button className="pencil" onClick={async () => { await api(`/api/messages/${m.id}`, 'PUT', { read: !m.read }); load(); }} aria-label={m.read ? 'Mark unread' : 'Mark read'}>
-              <Icon name="check" size={16} />
-            </button>
-            <button className="pencil danger" onClick={async () => { if (confirm('Delete this message?')) { await api(`/api/messages/${m.id}`, 'DELETE'); load(); } }} aria-label="Delete">
-              <Icon name="trash" size={16} />
-            </button>
-          </div>
-        </li>
-      ))}
-    </ul>
+    <div>
+      {toast && (
+        <div className="a-toast-banner" role="status">
+          <Icon name="check" size={16} /> {toast}
+        </div>
+      )}
+
+      <ul className="rows">
+        {items.map((m) => {
+          const replies: Array<{ id: string; subject: string; message: string; sentAt: string }> =
+            Array.isArray(m.replies) ? m.replies : [];
+
+          return (
+            <li key={m.id} className={`row msg${m.read ? '' : ' unread'}`}>
+              <div className="row-main">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <strong>
+                    {m.name} <a href={`mailto:${m.email}`}>{m.email}</a>
+                  </strong>
+                  {replies.length > 0 && (
+                    <span className="msg-badge replied" title={`${replies.length} reply sent`}>
+                      <Icon name="check" size={12} /> Replied ({replies.length})
+                    </span>
+                  )}
+                  {!m.read && (
+                    <span className="msg-badge" style={{ background: '#ffd500', color: '#111216' }}>
+                      New
+                    </span>
+                  )}
+                </div>
+                <span className="a-muted">{new Date(m.createdAt).toLocaleString()}</span>
+                <p>{m.message}</p>
+
+                {replies.length > 0 && (
+                  <div className="msg-replies">
+                    <div className="msg-replies-head">
+                      <strong style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Replies Sent via Email ({replies.length}):
+                      </strong>
+                    </div>
+                    {replies.map((r, idx) => (
+                      <div key={r.id || idx} className="msg-reply-item">
+                        <div className="msg-reply-meta">
+                          <strong style={{ color: 'var(--a-ink)' }}>{r.subject || 'Reply'}</strong>
+                          <span className="a-muted">{new Date(r.sentAt).toLocaleString()}</span>
+                        </div>
+                        <p className="msg-reply-body">{r.message}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="row-actions">
+                <button
+                  type="button"
+                  className="a-btn a-btn-primary a-btn-sm"
+                  onClick={() => openReply(m)}
+                  title={`Reply to ${m.name} via email`}
+                >
+                  <Icon name="reply" size={14} /> Reply
+                </button>
+                <button
+                  className="pencil"
+                  onClick={async () => {
+                    await api(`/api/messages/${m.id}`, 'PUT', { read: !m.read });
+                    load();
+                  }}
+                  aria-label={m.read ? 'Mark unread' : 'Mark read'}
+                  title={m.read ? 'Mark unread' : 'Mark read'}
+                >
+                  <Icon name="check" size={16} />
+                </button>
+                <button
+                  className="pencil danger"
+                  onClick={async () => {
+                    if (confirm('Delete this message?')) {
+                      await api(`/api/messages/${m.id}`, 'DELETE');
+                      load();
+                    }
+                  }}
+                  aria-label="Delete"
+                  title="Delete message"
+                >
+                  <Icon name="trash" size={16} />
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Reply Modal */}
+      {replyingTo && (
+        <div className="modal-back" onMouseDown={() => !sending && setReplyingTo(null)}>
+          <form
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Reply to ${replyingTo.name}`}
+            onMouseDown={(e) => e.stopPropagation()}
+            onSubmit={handleSendReply}
+          >
+            <header className="modal-head">
+              <h2>Reply to {replyingTo.name}</h2>
+              <button
+                type="button"
+                className="x"
+                onClick={() => !sending && setReplyingTo(null)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </header>
+
+            <div className="modal-body" style={{ display: 'grid', gap: '1rem' }}>
+              <div className="reply-recipient-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div>
+                    <strong>To:</strong> {replyingTo.name} &lt;{replyingTo.email}&gt;
+                  </div>
+                  <span className="a-muted">{new Date(replyingTo.createdAt).toLocaleString()}</span>
+                </div>
+                <div className="reply-original-quote">
+                  <span className="quote-label">Original Message:</span>
+                  <p>{replyingTo.message}</p>
+                </div>
+              </div>
+
+              <div className="a-field">
+                <label htmlFor="reply-subject">Subject</label>
+                <input
+                  id="reply-subject"
+                  type="text"
+                  value={replySubject}
+                  onChange={(e) => setReplySubject(e.target.value)}
+                  placeholder="Subject of email reply..."
+                  required
+                />
+              </div>
+
+              <div className="a-field">
+                <label htmlFor="reply-text">Your Email Reply</label>
+                <textarea
+                  id="reply-text"
+                  rows={6}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder={`Hi ${replyingTo.name},\n\nThank you for reaching out...`}
+                  required
+                  autoFocus
+                />
+                <small>
+                  This reply will be sent directly as an email to <strong>{replyingTo.email}</strong>.
+                </small>
+              </div>
+
+              {replyError && <p className="a-error">{replyError}</p>}
+            </div>
+
+            <footer className="modal-foot" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
+              <button
+                type="button"
+                className="a-btn a-btn-ghost"
+                onClick={() => setReplyingTo(null)}
+                disabled={sending}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="a-btn a-btn-ghost"
+                onClick={handleOpenInGmail}
+                disabled={sending || !replyText.trim()}
+                title="Open directly in Gmail with this reply and mark replied"
+              >
+                <Icon name="mail" size={15} /> Send via Gmail
+              </button>
+              <button
+                type="submit"
+                className="a-btn a-btn-primary"
+                disabled={sending || !replyText.trim()}
+              >
+                <Icon name="send" size={16} /> {sending ? 'Sending email…' : 'Send via Resend API'}
+              </button>
+            </footer>
+          </form>
+        </div>
+      )}
+    </div>
   );
 }
 

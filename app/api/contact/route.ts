@@ -3,6 +3,8 @@ import { clientIp, rateLimit } from '@/lib/utils/auth';
 import { fail, ok, readJson } from '@/lib/api';
 import * as store from '@/lib/store';
 
+import { sendNewMessageNotification } from '@/lib/email';
+
 const clean = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max);
 
 export async function POST(req: NextRequest) {
@@ -23,24 +25,12 @@ export async function POST(req: NextRequest) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail('Please enter a valid email address.');
   if (message.length < 5) return fail('Your message is a bit short.');
 
-  await store.insert('messages', { name, email, message, read: false });
+  await store.insert('messages', { name, email, message, read: false, replies: [] });
 
-  // Optional email notification through Resend (no extra dependency needed).
-  const key = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL;
-  if (key && to) {
-    fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: process.env.CONTACT_FROM_EMAIL || 'Portfolio <onboarding@resend.dev>',
-        to: [to],
-        reply_to: email,
-        subject: `New portfolio message from ${name}`,
-        text: `${message}\n\nFrom: ${name} <${email}>`,
-      }),
-    }).catch((e) => console.error('[contact] email notification failed', e));
-  }
+  // Send notification email to abhishekdass024@gmail.com (non-blocking)
+  sendNewMessageNotification({ name, email, message }).catch((err) => {
+    console.error('[contact] email notification failed:', err);
+  });
 
   return ok({ sent: true });
 }

@@ -24,7 +24,14 @@ export default function Header({ name }: { name: string }) {
   const isBlogRoute = pathname?.startsWith('/blog');
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    let prev = false;
+    const onScroll = () => {
+      const next = window.scrollY > 24;
+      if (next !== prev) {
+        prev = next;
+        setScrolled(next);
+      }
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);

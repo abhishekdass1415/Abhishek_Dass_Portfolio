@@ -49,6 +49,7 @@ body:has(.admin-shell) {
 .a-btn-primary { background: #ffd500; color: #111216; border-color: #ffd500; }
 .a-btn-primary:hover { box-shadow: 3px 3px 0 var(--a-shadow, var(--a-line)); }
 .a-btn-ghost { background: transparent; }
+.a-btn-sm { padding: 0.35rem 0.7rem; font-size: 0.84rem; gap: 0.35rem; }
 
 .login-wrap {
   min-height: 100svh;
@@ -240,8 +241,105 @@ body.admin-modal-open .admin-top {
 .row-main { display: grid; gap: 0.15rem; min-width: 0; }
 .row-main strong { overflow-wrap: anywhere; }
 .row-actions { display: flex; gap: 0.4rem; flex-shrink: 0; align-items: center; }
+.row.msg { align-items: flex-start; }
 .msg.unread { border-left: 10px solid #ffd500; }
-.msg p { margin: 0.4rem 0 0; white-space: pre-wrap; }
+.msg p { margin: 0.4rem 0 0; white-space: pre-wrap; word-break: break-word; }
+
+.msg-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 0.2rem 0.5rem; border: 1.5px solid var(--a-line);
+}
+.msg-badge.replied {
+  background: #10b981; color: #ffffff; border-color: #059669;
+}
+[data-theme="dark"] .msg-badge.replied {
+  background: #059669; color: #ffffff;
+}
+
+.msg-replies {
+  margin-top: 0.8rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--a-bg);
+  border: 1px solid var(--a-soft);
+  border-left: 4px solid #10b981;
+  display: grid;
+  gap: 0.6rem;
+}
+.msg-replies-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.msg-reply-item {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: 0.4rem;
+  border-top: 1px dashed var(--a-soft);
+}
+.msg-reply-item:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+.msg-reply-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  flex-wrap: wrap;
+}
+.msg-reply-body {
+  margin: 0.2rem 0 0 !important;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--a-ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.reply-recipient-card {
+  padding: 0.8rem 1rem;
+  background: var(--a-bg);
+  border: 2px solid var(--a-soft);
+  display: grid;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+}
+.reply-original-quote {
+  padding: 0.6rem 0.8rem;
+  background: var(--a-card);
+  border-left: 3px solid #ffd500;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.reply-original-quote .quote-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--a-muted);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.reply-original-quote p {
+  margin: 0;
+  font-size: 0.88rem;
+  white-space: pre-wrap;
+  color: var(--a-ink);
+}
+
+.a-toast-banner {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #10b981;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  border: 2px solid #059669;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
 .media-grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; }
 .media { padding: 0.7rem; display: grid; gap: 0.6rem; }
